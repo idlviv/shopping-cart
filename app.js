@@ -8,9 +8,8 @@ let expressHBS = require('express-handlebars');
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 let session = require('express-session');
-
-let index = require('./routes/index');
-let users = require('./routes/users');
+// let cookie = require('cookie-session');
+let routes = require('./routes');
 
 let app = express();
 
@@ -34,7 +33,6 @@ mongoose.connect('mongodb://brad:brad@ds143734.mlab.com:43734/shopping-cart', {u
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'hbs');
 
-
 app.engine('.hbs', expressHBS({defaultLayout: 'layout', extname: '.hbs'}));
 app.set('view engine', '.hbs');
 
@@ -45,12 +43,30 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
-app.use(express-session({secret: 'secret', resave: 'false', }));
+let expiryDate = new Date( Date.now() + 60 * 60 * 1000 ); // 1 hour
+// app.use(cookie(
+//   {
+//   name: 'cookie-session',
+//   keys: ['key1', 'key2'],
+//   cookie: {
+//     secure: true,
+//     httpOnly: true,
+//     // domain: 'example.com',
+//     // path: 'foo/bar',
+//     expires: expiryDate
+//   }
+// }));
+app.use(session(
+  {
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: false,
+  }
+  ));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
