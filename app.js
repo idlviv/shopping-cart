@@ -7,6 +7,7 @@ let bodyParser = require('body-parser');
 let expressHBS = require('express-handlebars');
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
+let session = require('express-session');
 
 let index = require('./routes/index');
 let users = require('./routes/users');
@@ -43,6 +44,9 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+
+app.use(express-session({secret: 'secret', resave: 'false', }));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
